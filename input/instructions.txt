@@ -1,0 +1,12 @@
+
+I found this interesting article about GPT-5: https://www.perplexity.ai/discover/tech/openai-adds-response-modes-to-2MyyZ.nnS6OuFP7_d7FXSw
+
+Write a post sharing this link and my thoughts aobut it. The article is about people rejecting GPT-5 because of its new "personality", which is
+more dry and direct than before.
+
+Key points:
+
+- people have been rejecting GPT-5 because they find its "personality" too robotic
+- I don't understand why LLMs should be verbose and overbearing with their communication style; they're tools,
+not psychoanalysts, they should provide short and concise answers
+- a model should not be warm by default, unless requested otherwise; it should provide concise and clear answers
