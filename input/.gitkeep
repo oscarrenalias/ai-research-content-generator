@@ -1,0 +1,14 @@
+# This folder is for LinkedIn export files
+# Place your downloaded LinkedIn export ZIP file here
+
+# Supported file patterns:
+# - linkedin_export.zip
+# - linkedin-export.zip  
+# - Basic_LinkedInDataExport_*.zip
+# - DataExport_*.zip
+# - Any .zip file containing LinkedIn data
+
+# The processor will automatically:
+# 1. Extract the ZIP file
+# 2. Find posts-related files (CSV/JSON)
+# 3. Process and save posts to ../posts/ folder

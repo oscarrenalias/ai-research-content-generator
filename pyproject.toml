@@ -1,0 +1,14 @@
+[project]
+name = "linkedin-post-generator"
+version = "1.0.0"
+description = "AI-powered LinkedIn post generator that learns and replicates your writing style"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "strands-agents[openai]>=1.4.0",
+    "python-dotenv>=1.0.0",
+]
+
+
+[tool.uv]
+dev-dependencies = []
