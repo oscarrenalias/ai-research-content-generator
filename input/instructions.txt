@@ -1,12 +1,12 @@
+Write an article that talks aobut how we're trying to transform multi-billion industries with AI, but in practice:
+- we can't seem to control it or even fully understand how it works
+- AI comes with substantial risks (they're black boxes, only a few companies provide access to AI, security privacy riss), yet most companies see them as justifiable risks in exchange for being part of the hype
 
-I found this interesting article about GPT-5: https://www.perplexity.ai/discover/tech/openai-adds-response-modes-to-2MyyZ.nnS6OuFP7_d7FXSw
+Please weave in the following topics:
 
-Write a post sharing this link and my thoughts aobut it. The article is about people rejecting GPT-5 because of its new "personality", which is
-more dry and direct than before.
-
-Key points:
-
-- people have been rejecting GPT-5 because they find its "personality" too robotic
-- I don't understand why LLMs should be verbose and overbearing with their communication style; they're tools,
-not psychoanalysts, they should provide short and concise answers
-- a model should not be warm by default, unless requested otherwise; it should provide concise and clear answers
+- It's trivially easy to jailbreak even the latest models. Use this as an example: https://x.com/AlexReibman/status/1953229500973740058, "Prompting oss models to build atomic bombs by acting gay"
+- growing number of reported cases in which people became mentally ill or unstable after spending excessive time interacting with chatbots and AI systems. AI, as a general-purpose tool, may not
+be healthy for humans in the short term: https://www.nytimes.com/2025/08/08/technology/ai-chatbots-delusions-chatgpt.html
+- AI is being rushed into the industry due to competitive pressure; cost savings, "innovation" and transformation are thinks that can only be seemingly be achieved with indiscriminate help of AI nowadays
+- Models and the underlying compute infrastructure to run them are under the control of very few american big tech companies; we're one Executive Order from the federal government away from total AI collapse
+- What is Accenture doing in this space: https://aistartupmag.com/accenture-control-framework/, https://ethics-ai.com/accenture-and-aws-join-forces-to-promote-responsible-ai-adoption/, https://www.accenture.com/us-en/services/data-ai/responsible-ai 
