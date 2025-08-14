@@ -227,12 +227,13 @@ Key principles:
         
         return "\n".join(context_parts)
     
-    def compose_linkedin_post(self, context: Dict[str, Any]) -> str:
+    def compose_linkedin_post(self, context: Dict[str, Any], debug: bool = False) -> str:
         """
         Generate the final LinkedIn post using all available context
         
         Args:
             context: Dictionary containing all context information
+            debug: If True, prints the full prompt being sent to the model
             
         Returns:
             Generated LinkedIn post
@@ -278,6 +279,15 @@ Based on all the information above, generate a LinkedIn post that:
 6. Follows LinkedIn best practices for professional engagement
 
 Generate the LinkedIn post now:"""
+
+        # Debug: Print the full prompt if requested
+        if debug:
+            print("\n" + "="*80)
+            print("🐛 DEBUG: FULL PROMPT BEING SENT TO MODEL")
+            print("="*80)
+            print(full_prompt)
+            print("="*80)
+            print()
 
         try:
             # Generate the post
@@ -345,7 +355,8 @@ def main():
             }
         }
         
-        post = agent.compose_linkedin_post(test_context)
+        # Test with debug enabled to see the prompt
+        post = agent.compose_linkedin_post(test_context, debug=True)
         
         print("\n" + "="*60)
         print("GENERATED LINKEDIN POST")

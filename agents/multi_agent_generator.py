@@ -193,7 +193,7 @@ Focus on creating content that sparks meaningful professional discussion.""",
                     "link_analysis": context_data.get("link_analysis", {}),
                     "research_findings": context_data.get("topic_research", {})
                 }
-                result = self.composition_agent.compose_linkedin_post(composition_context)
+                result = self.composition_agent.compose_linkedin_post(composition_context, debug=self.debug)
                 
             else:
                 raise Exception(f"Unknown agent type: {agent_type}")
@@ -259,7 +259,7 @@ Focus on creating content that sparks meaningful professional discussion.""",
             "research_findings": research_findings
         }
         
-        final_post = self.composition_agent.compose_linkedin_post(composition_context)
+        final_post = self.composition_agent.compose_linkedin_post(composition_context, debug=self.debug)
         
         if self.debug:
             print(f"🐛 Final post length: {len(final_post)} characters")
