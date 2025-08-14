@@ -8,6 +8,7 @@ dependencies = [
     "strands-agents[openai]>=1.4.0",
     "python-dotenv>=1.0.0",
     "strands-agents-tools>=0.2.3",
+    "tavily-python>=0.7.10",
 ]
 
 

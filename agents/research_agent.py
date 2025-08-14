@@ -10,6 +10,7 @@ import json
 import re
 from typing import List, Dict, Any
 from strands import Agent
+from tavily import TavilyClient
 
 
 class ResearchAgent:
@@ -28,6 +29,21 @@ class ResearchAgent:
         if not self.openai_api_key:
             raise Exception("OPENAI_API_KEY not found. Please set it in .env file or pass it directly.")
         
+        # Check if Tavily API key is available
+        import os
+        from dotenv import load_dotenv
+        load_dotenv()
+        self.tavily_api_key = os.getenv("TAVILY_API_KEY")
+        self.has_web_search = bool(self.tavily_api_key and self.tavily_api_key != "your_tavily_api_key_here")
+        
+        if self.has_web_search:
+            self.tavily_client = TavilyClient(api_key=self.tavily_api_key)
+            print("✅ Tavily web search enabled")
+        else:
+            self.tavily_client = None
+            print("⚠️ Tavily API key not configured. Research will use knowledge-based analysis only.")
+            print("   To enable web search, get an API key from https://www.tavily.com/ and set TAVILY_API_KEY in .env")
+        
         # Initialize agent with OpenAI model
         try:
             from strands.models.openai import OpenAIModel
@@ -38,8 +54,21 @@ class ResearchAgent:
                 params={"temperature": 0.3, "max_tokens": 2000}
             )
             
-            self.agent = Agent(
-                system_prompt="""You are a research specialist focused on generating comprehensive topic insights for LinkedIn content creation. Your job is to:
+            # Configure system prompt based on web search availability
+            if self.has_web_search:
+                system_prompt = """You are a research specialist focused on generating comprehensive topic insights for LinkedIn content creation. Your job is to:
+
+1. Extract key topics and themes from instructions and existing analysis
+2. Analyze web search results provided to you to gather current information and trends
+3. Provide industry context and current trends for each topic based on search results
+4. Generate supporting statistics, expert opinions, and data points from reliable sources
+5. Identify angles and perspectives that would resonate on LinkedIn
+6. Create actionable insights for content creation
+7. Focus on professional, business-relevant information
+
+You will be provided with web search results for each topic. Use this information to provide comprehensive, current insights. Always structure your research in a clear, organized format that can be easily used for content creation."""
+            else:
+                system_prompt = """You are a research specialist focused on generating comprehensive topic insights for LinkedIn content creation. Your job is to:
 
 1. Extract key topics and themes from instructions and existing analysis
 2. Provide industry context and current trends for each topic based on your knowledge
@@ -48,7 +77,10 @@ class ResearchAgent:
 5. Create actionable insights for content creation
 6. Focus on professional, business-relevant information
 
-You have extensive knowledge up to your training cutoff. Use this knowledge to provide comprehensive insights without needing external web searches. Always structure your research in a clear, organized format that can be easily used for content creation.""",
+Use your extensive knowledge to provide comprehensive insights. Always structure your research in a clear, organized format that can be easily used for content creation."""
+            
+            self.agent = Agent(
+                system_prompt=system_prompt,
                 model=openai_model
             )
             
@@ -140,13 +172,92 @@ Return the topics as a simple JSON list: ["topic1", "topic2", "topic3"]"""
         """
         print(f"🔍 Researching topic: {topic}")
         
-        research_prompt = f"""Based on your existing knowledge, conduct comprehensive research on the following topic for LinkedIn content creation:
+        # Perform web search if available
+        search_results = ""
+        if self.has_web_search:
+            try:
+                print(f"🌐 Conducting web search for: {topic}")
+                # Search for current information about the topic
+                search_response = self.tavily_client.search(
+                    query=f"{topic} recent developments trends 2024 2025",
+                    search_depth="advanced",
+                    max_results=5,
+                    include_raw_content=True
+                )
+                
+                # Format search results for the AI agent
+                if search_response and 'results' in search_response:
+                    search_results = "\n\nWEB SEARCH RESULTS:\n"
+                    for i, result in enumerate(search_response['results'][:5], 1):
+                        search_results += f"\n{i}. {result.get('title', 'No title')}\n"
+                        search_results += f"   URL: {result.get('url', 'No URL')}\n"
+                        search_results += f"   Content: {result.get('content', 'No content')[:500]}...\n"
+                        
+                    print(f"✅ Found {len(search_response['results'])} search results")
+                else:
+                    print("⚠️ No search results found")
+                    
+            except Exception as e:
+                print(f"⚠️ Web search failed: {e}")
+                search_results = ""
+        
+        if self.has_web_search and search_results:
+            research_prompt = f"""Conduct comprehensive research on the following topic for LinkedIn content creation using the provided web search results:
 
 TOPIC: {topic}
 
 CONTEXT: {context[:1000]}  # Additional context for better understanding
 
-Using your training data and knowledge base (no external web searches needed), please provide comprehensive research insights in the following JSON format:
+{search_results}
+
+Based on the web search results above, provide comprehensive research insights in the following JSON format:
+
+{{
+    "topic": "{topic}",
+    "current_trends": [
+        "Current trend 1 with recent evidence from search results",
+        "Current trend 2 with recent evidence from search results"
+    ],
+    "key_statistics": [
+        "Recent statistic 1 with source from search results",
+        "Recent statistic 2 with source from search results"
+    ],
+    "industry_implications": [
+        "Business implication 1 based on current information",
+        "Business implication 2 based on current information"
+    ],
+    "expert_perspectives": [
+        "Recent expert viewpoint 1 from search results",
+        "Recent expert viewpoint 2 from search results"
+    ],
+    "linkedin_angles": [
+        "Angle 1: Why this matters to professionals right now",
+        "Angle 2: How this affects business strategy today",
+        "Angle 3: Current career development implications"
+    ],
+    "supporting_arguments": [
+        "Argument 1 supported by recent developments",
+        "Argument 2 supported by recent developments"
+    ],
+    "potential_controversies": [
+        "Current debate point 1 from recent discussions",
+        "Current debate point 2 from recent discussions"
+    ],
+    "actionable_insights": [
+        "Actionable insight 1 based on current information",
+        "Actionable insight 2 based on current information"
+    ]
+}}
+
+Focus on the most recent information from the search results."""
+        else:
+            research_prompt = f"""Based on your existing knowledge, conduct comprehensive research on the following topic for LinkedIn content creation:
+
+TOPIC: {topic}
+
+CONTEXT: {context[:1000]}  # Additional context for better understanding
+
+Using your training data and knowledge base, please provide comprehensive research insights in the following JSON format:
 
 {{
     "topic": "{topic}",
@@ -185,7 +296,53 @@ Using your training data and knowledge base (no external web searches needed), p
     ]
 }}
 
-Focus on information from your training data that would be valuable for LinkedIn content creation and professional discussion. Do not attempt to access external websites or APIs."""
+Focus on information from your training data that would be valuable for LinkedIn content creation and professional discussion."""
+            research_prompt = f"""Based on your existing knowledge, conduct comprehensive research on the following topic for LinkedIn content creation:
+
+TOPIC: {topic}
+
+CONTEXT: {context[:1000]}  # Additional context for better understanding
+
+Using your training data and knowledge base, please provide comprehensive research insights in the following JSON format:
+
+{{
+    "topic": "{topic}",
+    "current_trends": [
+        "Current trend 1 related to this topic based on your knowledge",
+        "Current trend 2 related to this topic based on your knowledge"
+    ],
+    "key_statistics": [
+        "Relevant statistic 1 (with approximate source if known)",
+        "Relevant statistic 2 (with approximate source if known)"
+    ],
+    "industry_implications": [
+        "Business implication 1",
+        "Business implication 2"
+    ],
+    "expert_perspectives": [
+        "Expert viewpoint 1 based on known industry opinions",
+        "Expert viewpoint 2 based on known industry opinions"
+    ],
+    "linkedin_angles": [
+        "Angle 1: Why this matters to professionals",
+        "Angle 2: How this affects business strategy",
+        "Angle 3: Career development implications"
+    ],
+    "supporting_arguments": [
+        "Argument 1 supporting main thesis",
+        "Argument 2 supporting main thesis"
+    ],
+    "potential_controversies": [
+        "Debate point 1",
+        "Debate point 2"
+    ],
+    "actionable_insights": [
+        "Actionable insight 1 for readers",
+        "Actionable insight 2 for readers"
+    ]
+}}
+
+Focus on information from your training data that would be valuable for LinkedIn content creation and professional discussion."""
 
         try:
             response = self.agent(research_prompt)
