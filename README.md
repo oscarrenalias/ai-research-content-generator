@@ -25,7 +25,7 @@ Generate compelling LinkedIn posts that match your unique writing style using AI
 
 1. **Install dependencies**:
    ```bash
-   uv add 'strands-agents[openai]' python-dotenv
+   uv add 'strands-agents[openai]' python-dotenv strands-agents-tools tavily-python
    ```
 
 2. **Configure environment**:
@@ -34,7 +34,29 @@ Generate compelling LinkedIn posts that match your unique writing style using AI
    GITHUB_TOKEN=your_github_models_token_here
    ```
 
-3. **Get your LinkedIn posts**:
+3. **Enable Web Search (Optional)**:
+   For real-time web search capabilities in the multi-agent system, set up Tavily API:
+   
+   - Visit [https://www.tavily.com/](https://www.tavily.com/)
+   - Sign up for a free account
+   - Navigate to the API section of your dashboard
+   - Copy your API key
+   - Add it to your `.env` file:
+   ```bash
+   TAVILY_API_KEY=tvly-your-actual-api-key-here
+   ```
+   
+   **Features enabled with Tavily API:**
+   - ✅ Real-time web searches for current trends
+   - ✅ Recent statistics and data points  
+   - ✅ Expert opinions from recent articles
+   - ✅ Current business implications
+   - ✅ LinkedIn-relevant discussion points
+   - ✅ Information from the last 6 months
+   
+   **Note**: If not configured, the system automatically falls back to knowledge-based research using the AI model's training data.
+
+4. **Get your LinkedIn posts**:
    - **Option A**: Use LinkedIn data export (recommended)
      - Request your data from LinkedIn Settings > Privacy > Get a copy of your data
      - Place the ZIP file in `input/` folder
@@ -44,20 +66,31 @@ Generate compelling LinkedIn posts that match your unique writing style using AI
      - Create text files in the `posts/` folder
      - Each file should contain one post's content
 
-4. **Create your instructions**:
+5. **Create your instructions**:
    Edit `input/instructions.txt` with what you want your post to be about.
 
 ### Usage
 
-**Option A: AI-Powered Post Generation**
+**Option A: Multi-Agent Post Generation (Recommended)**
+```bash
+python linkedin_multi_agent_generator.py
+```
+
+**Option B: AI-Powered Post Generation**
 ```bash
 python linkedin_post_generator.py
 ```
 
-**Option B: Advanced Style Analysis (Recommended)**
+**Option C: Advanced Style Analysis**
 ```bash
 python linkedin_style_analyzer.py
 ```
+
+The **Multi-Agent Generator** will:
+1. 🔗 Analyze any URLs in your instructions for context
+2. 🔍 Conduct real-time web research on your topics (with Tavily API)
+3. 📝 Generate posts using specialized agents for link analysis, research, and composition
+4. 🎯 Combine current web data with your personal writing style
 
 The **Style Analyzer** will:
 1. 🔍 Perform deep analysis of all your posts
@@ -74,22 +107,28 @@ The **Post Generator** will:
 ## 📁 Folder Structure
 ```
 linkedin-post-generator/
-├── input/                    # Input files
-│   ├── instructions.txt      # Your post instructions  
-│   └── [data_export.zip]     # LinkedIn export (optional)
-├── posts/                    # Your existing posts (one file per post)
+├── input/                         # Input files
+│   ├── instructions.txt           # Your post instructions  
+│   └── [data_export.zip]          # LinkedIn export (optional)
+├── posts/                         # Your existing posts (one file per post)
 │   ├── post_1.txt
 │   └── ...
-├── templates/                # AI prompt templates
+├── agents/                        # Multi-agent system components
+│   ├── __init__.py
+│   ├── link_analysis_agent.py     # URL analysis and content extraction
+│   ├── research_agent.py          # Real-time web research with Tavily
+│   └── post_composition_agent.py  # Final post generation
+├── templates/                     # AI prompt templates
 │   └── linkedin_system_prompt.txt
-├── linkedin_style_analyzer.py   # Advanced style analysis tool
-├── linkedin_post_generator.py   # Main AI post generator
-├── linkedin_export_processor.py # Process LinkedIn exports
-├── test_style_analyzer.py      # Test analyzer functionality
-├── config.py                 # Configuration settings
-├── .env                      # Environment variables
-├── STYLE_ANALYZER_GUIDE.md   # Detailed analyzer guide
-└── README.md                 # This file
+├── linkedin_multi_agent_generator.py  # Multi-agent post generator (recommended)
+├── linkedin_style_analyzer.py        # Advanced style analysis tool
+├── linkedin_post_generator.py        # Main AI post generator
+├── linkedin_export_processor.py      # Process LinkedIn exports
+├── test_style_analyzer.py           # Test analyzer functionality
+├── config.py                        # Configuration settings
+├── .env                             # Environment variables
+├── STYLE_ANALYZER_GUIDE.md          # Detailed analyzer guide
+└── README.md                        # This file
 ```
 
 ## ⚙️ Configuration
@@ -151,22 +190,15 @@ LinkedIn has restricted access to the `r_member_social` permission. The data exp
 - **"Generation failed"**: Try simpler instructions or check the model configuration
 - **"Package not found"**: Run `uv add <package-name>` to install missing dependencies
 
+### Multi-Agent System Issues
+- **"TAVILY_API_KEY not found"**: Add your Tavily API key to `.env` file (optional - system will fallback to knowledge-based research)
+- **Web search not working**: Verify your Tavily API key at [https://www.tavily.com/](https://www.tavily.com/)
+- **Multi-agent generation slow**: This is normal - the system analyzes links, conducts research, and generates posts sequentially
+
 ### Export Processor Issues  
 - **"Export file not found"**: Make sure your ZIP file is in the `input/` folder
 - **"No posts found"**: Check that you selected "Posts" when requesting your data export
 - **Processing errors**: The script handles various export formats automatically
-
-## 🤝 Contributing
-
-Contributions welcome! Areas for improvement:
-- Additional AI model providers
-- Better style analysis algorithms
-- Enhanced post formatting options
-- LinkedIn API integration (when available)
-
-## 📄 License
-
-MIT License - feel free to use this for your LinkedIn content creation!
 
 ## Supported Export Formats
 The script automatically detects and processes:
