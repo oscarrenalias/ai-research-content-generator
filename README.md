@@ -35,14 +35,30 @@ Yes, this was vibe coded.
 
 2. **Configure environment**:
 
-Edit file .venv and add the following:
+Copy ```.env.sample``` to ```.env``` and update as needed:
+
+These are used for post generation (writing). Use a different model or temperature if you'd like the model to get
+more creative:
 
 ```
 # Model configuration
 DEFAULT_MODEL=gpt-4o
 DEFAULT_TEMPERATURE=0.7
 DEFAULT_MAX_TOKENS=8000
+```
 
+These models are used for style analysis; the first one is the model used for analyzing content provided in the posts/ folder, whereas the second is for aggregating analysis insights from batches and generating the style guide. It is recommended to use two separate models to avoid hitting token per minute quotas in the OpenAI APIs:
+
+```
+# Model for batch processing (structural, tone, engagement analysis)
+ANALYZER_BATCH_MODEL=gpt-4o-mini
+# Model for final synthesis and style prompt generation
+ANALYZER_SYNTHESIS_MODEL=gpt-4o
+```
+
+API keys, required to connect to the OpenAI API endpoints, as well as to Tavily to perform searches:
+
+```
 # OpenAI endpoint configuration
 OPENAI_API_KEY=sk-proj-xxx
 
