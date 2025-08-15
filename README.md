@@ -2,7 +2,11 @@
 
 ## 🌟 Overview
 
-Generate compelling LinkedIn posts that match your unique writing style using AI. This tool analyzes your existing posts and creates new content that sounds authentically like you.
+Generate compelling posts backed with automated research based on guidance provided, written in a style that matches someone's unique writing style using AI. This tool analyzes your existing posts and creates new content that sounds authentically like you.
+
+## Disclaimer
+
+Yes, this was vibe coded.
 
 ### Features
 
@@ -17,22 +21,34 @@ Generate compelling LinkedIn posts that match your unique writing style using AI
 
 ### Prerequisites
 
-- Python 3.8+
-- GitHub Models API access (or compatible OpenAI API)
-- Your existing LinkedIn posts (via data export or manual collection)
+- Python 3.13
+- Existing content (e.g., LinkedIn posts) to be analyzed for style
+- An OpenAI API key
+- A Tavily API key
 
 ### Setup
 
 1. **Install dependencies**:
    ```bash
-   uv add 'strands-agents[openai]' python-dotenv strands-agents-tools tavily-python
+   uv sync
    ```
 
 2. **Configure environment**:
-   Add your GitHub Models token to `.env`:
-   ```bash
-   GITHUB_TOKEN=your_github_models_token_here
-   ```
+
+Edit file .venv and add the following:
+
+```
+# Model configuration
+DEFAULT_MODEL=gpt-4o
+DEFAULT_TEMPERATURE=0.7
+DEFAULT_MAX_TOKENS=8000
+
+# OpenAI endpoint configuration
+OPENAI_API_KEY=sk-proj-xxx
+
+# Tavily API Configuration
+TAVILY_API_KEY=tvly-dev-xxx
+```
 
 3. **Enable Web Search (Optional)**:
    For real-time web search capabilities in the multi-agent system, set up Tavily API:
@@ -42,10 +58,11 @@ Generate compelling LinkedIn posts that match your unique writing style using AI
    - Navigate to the API section of your dashboard
    - Copy your API key
    - Add it to your `.env` file:
+   
    ```bash
    TAVILY_API_KEY=tvly-your-actual-api-key-here
    ```
-   
+
    **Features enabled with Tavily API:**
    - ✅ Real-time web searches for current trends
    - ✅ Recent statistics and data points  
@@ -71,17 +88,15 @@ Generate compelling LinkedIn posts that match your unique writing style using AI
 
 ### Usage
 
-**Option A: Multi-Agent Post Generation (Recommended)**
+**Multi-Agent Content Generation**
 ```bash
 python linkedin_multi_agent_generator.py
 ```
 
-**Option B: AI-Powered Post Generation**
-```bash
-python linkedin_post_generator.py
-```
+**Style Analysis**
 
-**Option C: Advanced Style Analysis**
+This is required to instruct the model how to write:
+
 ```bash
 python linkedin_style_analyzer.py
 ```
@@ -98,12 +113,6 @@ The **Style Analyzer** will:
 3. 🎯 Generate a comprehensive style prompt for any LLM
 4. 💡 Provide quantified insights into your unique voice
 
-The **Post Generator** will:
-1. 📊 Analyze your writing style from existing posts
-2. 🤖 Generate a new post based on your instructions
-3. 🔄 Allow you to refine and improve the post
-4. 💾 Save the final result
-
 ## 📁 Folder Structure
 ```
 linkedin-post-generator/
@@ -118,27 +127,12 @@ linkedin-post-generator/
 │   ├── link_analysis_agent.py     # URL analysis and content extraction
 │   ├── research_agent.py          # Real-time web research with Tavily
 │   └── post_composition_agent.py  # Final post generation
-├── templates/                     # AI prompt templates
-│   └── linkedin_system_prompt.txt
 ├── linkedin_multi_agent_generator.py  # Multi-agent post generator (recommended)
 ├── linkedin_style_analyzer.py        # Advanced style analysis tool
-├── linkedin_post_generator.py        # Main AI post generator
-├── linkedin_export_processor.py      # Process LinkedIn exports
-├── test_style_analyzer.py           # Test analyzer functionality
-├── config.py                        # Configuration settings
+├── linkedin_export_processor.py      # Process LinkedIn exportss
 ├── .env                             # Environment variables
-├── STYLE_ANALYZER_GUIDE.md          # Detailed analyzer guide
 └── README.md                        # This file
 ```
-
-## ⚙️ Configuration
-
-Edit `config.py` to customize:
-
-- **Model Settings**: Change AI model, temperature, max tokens
-- **Style Learning**: Adjust number of reference posts, filtering criteria  
-- **Generation Options**: Refinement iterations, auto-save, display options
-
 ## 📝 Tips for Better Posts
 
 1. **Quality Reference Posts**: Ensure your existing posts in `posts/` are high-quality examples of your writing
@@ -199,10 +193,3 @@ LinkedIn has restricted access to the `r_member_social` permission. The data exp
 - **"Export file not found"**: Make sure your ZIP file is in the `input/` folder
 - **"No posts found"**: Check that you selected "Posts" when requesting your data export
 - **Processing errors**: The script handles various export formats automatically
-
-## Supported Export Formats
-The script automatically detects and processes:
-- CSV files with posts data
-- JSON files with posts data
-- Various LinkedIn export naming conventions
-- Multiple file structures within exports
