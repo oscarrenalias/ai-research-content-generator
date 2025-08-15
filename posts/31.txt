@@ -1,0 +1,5 @@
+A great article that talks about the "attention economy" in a digital world, and how apps and services are trying to grab too much of a resource that by itself is already very limited: https://lnkd.in/dUCwHC9c. 
+
+One of the worst examples is LinkedIn, where my feed has become infested with unsolicited videos that play automatically trying to get a click. I just saw a particularly obnoxious one, with very bright green graphics and constant transitions, which made it impossible to focus on anything else until it scrolled out of view. 
+
+Last but not least, this other article talks about what Apple could do in iOS to control the end to end user experience on iOS, like system-wide autoplay settings for videos, infinite feeds converted into standard page scrolling, hide/disable the most distracting parts of apps, and a few more disruptive ideas that could reduce the attention that apps demand from us nowadays: https://lnkd.in/d_ghkTtA

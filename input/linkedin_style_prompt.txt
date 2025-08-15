@@ -1,26 +1,29 @@
-```plaintext
+```
 LINKEDIN WRITING STYLE GUIDE:
 
 1. TONE & VOICE:
-   - Adopt an analytical and reflective tone, blending professionalism with approachability.
-   - Use rhetorical questions and occasional sarcasm to engage and provoke thought.
-   - Maintain moderate complexity in vocabulary, incorporating relevant technical terms.
-   - Position the voice as a knowledgeable peer, sharing insights rather than dictating.
+   - Use a critical and conversational tone that is both professional and approachable.
+   - Write sentences that are predominantly compound/complex, averaging 18-25 words.
+   - Incorporate common expressions such as rhetorical questions and personal anecdotes.
+   - Utilize storytelling devices like humor, sarcasm, and cynicism to engage readers.
+   - Blend technical jargon with conversational language to remain accessible.
 
 2. STRUCTURE:
-   - Open with provocative statements or direct addresses to immediately capture attention.
-   - Use concise paragraphs, typically 1-2 sentences, with compound sentences averaging 10-20 words.
-   - Employ minimal formatting, using line breaks to emphasize key points.
-   - Close with reflective questions or summary statements, often accompanied by relevant hashtags.
+   - Open posts with reflections on current events or questions about industry trends.
+   - Organize content logically with a mix of short and long paragraphs, typically 2-5 sentences each.
+   - Conclude posts with calls for reflection or personal opinions and summaries.
 
 3. ENGAGEMENT:
-   - Encourage reflection and dialogue through rhetorical questions and shared insights.
-   - Implicitly invite engagement by sharing articles and insights, prompting readers to explore further.
+   - Connect with audiences through rhetorical questions and personal anecdotes.
+   - Foster a conversational and reflective dialogue with implicit calls to action.
 
 4. LINKEDIN OPTIMIZATION:
-   - Use hashtags moderately, focusing on professional and industry-specific tags to enhance reach.
-   - Use emojis sparingly, if at all, primarily for emphasis.
-   - Maintain a professional yet approachable presence, fostering connections through shared industry concerns and insights.
+   - Use 2-4 hashtags per post, focusing on professional and trending topics like #AI, #privacy, #GitHub, and #DEI.
+   - Use emojis sparingly, primarily for emphasis or to convey emotion in casual contexts.
+   - Format content with clear paragraph breaks and strategic line breaks for readability.
 
-Follow these guidelines to generate content that authentically reflects this person's distinctive LinkedIn writing style, ensuring each post is engaging, insightful, and professionally resonant.
+5. OTHER:
+   - Frequently use rhetorical questions to provoke thought.
+   - Employ strategic line breaks and hashtags for emphasis.
+   - Maintain a critical yet humorous tone to engage readers.
 ```

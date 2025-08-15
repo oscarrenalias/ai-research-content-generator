@@ -1,0 +1,3 @@
+OpenAI, which literally has dozens of lawsuits accusing it of using copyrighted data to train its models without permission, now throws an unsubstantiated tantrum when they’re treated the same way they have treated other sources of data before. 
+
+*This* is why responsible AI is so important, including guaranteeing that models are appropriately trained with data sustainably sourced. See how we can help: https://lnkd.in/dMTimVR8

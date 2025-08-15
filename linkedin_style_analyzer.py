@@ -23,29 +23,52 @@ class LinkedInStyleAnalyzer:
         
         # OpenAI configuration
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
-        self.default_model = os.getenv("DEFAULT_MODEL", "gpt-4o")  # Use gpt-4o as default for OpenAI
+        self.batch_model = os.getenv("ANALYZER_BATCH_MODEL", "gpt-4o-mini")  # Model for batch processing
+        self.synthesis_model = os.getenv("ANALYZER_SYNTHESIS_MODEL", "gpt-4o")  # Model for final synthesis
         self.analysis_temperature = 0.3  # Lower temperature for more consistent analysis
         self.max_tokens = 2000  # Higher limits with OpenAI
+        
+        # Analysis configuration
+        self.batch_size = int(os.getenv("ANALYSIS_BATCH_SIZE", "5"))  # Default to 5 if not specified
         
         if not self.openai_api_key:
             raise Exception("OPENAI_API_KEY not found in .env file")
         
-        # Initialize Strands OpenAI model and agent for direct OpenAI endpoints
+        # Initialize two different agents: one for batch processing, one for synthesis
         try:
-            model = OpenAIModel(
+            # Batch processing agent (using cheaper/faster model)
+            batch_model = OpenAIModel(
                 client_args={
                     "api_key": self.openai_api_key,
                     # No base_url needed for direct OpenAI endpoints
                 },
-                model_id=self.default_model,
+                model_id=self.batch_model,
                 params={
                     "temperature": self.analysis_temperature,
                     "max_tokens": self.max_tokens
                 }
             )
             
-            self.agent = Agent(model=model)
+            # Synthesis agent (using higher-quality model)
+            synthesis_model = OpenAIModel(
+                client_args={
+                    "api_key": self.openai_api_key,
+                    # No base_url needed for direct OpenAI endpoints
+                },
+                model_id=self.synthesis_model,
+                params={
+                    "temperature": self.analysis_temperature,
+                    "max_tokens": self.max_tokens
+                }
+            )
+            
+            self.batch_agent = Agent(model=batch_model)
+            self.synthesis_agent = Agent(model=synthesis_model)
+            
             print("✅ Connected to OpenAI API for style analysis")
+            print(f"🔍 Batch processing model: {self.batch_model}")
+            print(f"🎯 Final synthesis model: {self.synthesis_model}")
+            print(f"📊 Analysis batch size configured: {self.batch_size} posts per batch")
         except Exception as e:
             raise Exception(f"Failed to initialize OpenAI client: {e}")
         
@@ -135,6 +158,32 @@ Return your analysis in this JSON format:
     "line_breaks": "usage pattern",
     "spacing": "style description"
   },
+  "traits": {
+    "common_expressions": ["common expression 1", "common phrase 2"], # common phrases or expressions used
+    "tone": [ "professional", "casual", "friendly"] # tone characteristics observed, pick no more than 2
+  },
+  "tone": {
+    "sarcasm": {
+      "frequency": "X per 100 sentences",
+      "markers": ["hyperbolic understatement", "mock praise", "deliberate contradiction"],
+      "strength": "subtle / moderate / heavy" # pick only one
+    },
+    "cynicism": {
+      "frequency": "X per 100 sentences",
+      "markers": ["skeptical framing", "negative generalizations", "assumption of bad motives"],
+      "strength": "low / medium / high" # pick only one
+    },
+    "irony": {
+      "frequency": "X per 100 sentences",
+      "markers": ["literal meaning opposite to context", "contextual reversal"],
+      "strength": "light / moderate / sharp" # pick only one
+    },
+    "humor": {
+      "frequency": "X per 100 sentences",
+      "markers": ["absurd comparisons", "puns", "mock scenarios"],
+      "strength": "dry / playful / biting" # pick only oneg
+    }    
+  }
   "opening_patterns": ["most common openings"],
   "closing_patterns": ["most common closings"]
 }
@@ -145,7 +194,7 @@ Return your analysis in this JSON format:
         return """
 Analyze the tone, voice, and personality characteristics in the following LinkedIn posts. Focus on:
 
-TONE CHARACTERISTICS:
+TONE:
 1. Professional level (highly formal, professional but approachable, casual professional, etc.)
 2. Emotional tone (optimistic, analytical, reflective, confident, humble, etc.)
 3. Authority level (expert/thought leader, peer/colleague, learner/student)
@@ -157,15 +206,18 @@ VOICE PATTERNS:
 3. Vulnerability vs authority balance
 4. Humor or personality injection
 
-LANGUAGE STYLE:
+STYLE:
 1. Vocabulary complexity (technical jargon, business language, conversational)
 2. Industry-specific terminology usage
-3. Metaphors, analogies, or storytelling devices
-4. Energy level and enthusiasm patterns
+3. Energy level and enthusiasm patterns
+
+TRAITS:
+1. Ssarcasm and cynicism, e.g., frequent sarcasm or cynical remarks to make a point
+2. Metaphors, analogies, or storytelling devices
 
 Return your analysis in this JSON format:
 {
-  "tone_profile": {
+  "tone": {
     "professional_level": "description",
     "emotional_tone": "primary characteristics",
     "authority_style": "how they position themselves",
@@ -180,8 +232,30 @@ Return your analysis in this JSON format:
   "language_patterns": {
     "vocabulary_level": "complexity description",
     "industry_language": "technical vs accessible",
-    "rhetorical_devices": ["devices they commonly use"],
     "energy_signature": "their typical energy/enthusiasm level"
+  }
+  "tone": {
+    "rhetorical_devices": ["devices they commonly use"],
+    "sarcasm": {
+      "frequency": "X per 100 sentences",
+      "markers": ["hyperbolic understatement", "mock praise", "deliberate contradiction"],
+      "strength": "subtle / moderate / heavy" # pick only one
+    },
+    "cynicism": {
+      "frequency": "X per 100 sentences",
+      "markers": ["skeptical framing", "negative generalizations", "assumption of bad motives"],
+      "strength": "low / medium / high" # pick only one
+    },
+    "irony": {
+      "frequency": "X per 100 sentences",
+      "markers": ["literal meaning opposite to context", "contextual reversal"],
+      "strength": "light / moderate / sharp" # pick only one
+    },
+    "humor": {
+      "frequency": "X per 100 sentences",
+      "markers": ["absurd comparisons", "puns", "mock scenarios"],
+      "strength": "dry / playful / biting" # pick only oneg
+    }  
   }
 }
 """
@@ -232,9 +306,14 @@ Return your analysis in this JSON format:
 }
 """
     
-    def analyze_posts_batch(self, posts, batch_size=5):
+    def analyze_posts_batch(self, posts, batch_size=None):
         """Analyze posts in batches using AI"""
+        # Use instance batch size if not provided
+        if batch_size is None:
+            batch_size = self.batch_size
+            
         print(f"🔍 Starting analysis of {len(posts)} posts in batches of {batch_size}")
+        print(f"📊 Batch size configured from ANALYSIS_BATCH_SIZE: {batch_size}")
         
         # Create analysis prompts
         structural_prompt = self.create_structural_analysis_prompt()
@@ -286,12 +365,16 @@ Return your analysis in this JSON format:
         
         return all_analyses
     
-    def run_analysis(self, prompt):
-        """Run a single analysis using the AI"""
+    def run_analysis(self, prompt, use_synthesis_model=False):
+        """Run a single analysis using the appropriate AI model"""
         try:
             system_message = "You are an expert writing style analyst. Analyze the provided LinkedIn posts and return detailed insights in the requested JSON format. Be specific and quantitative where possible."
             
-            response = self.agent(f"{system_message}\n\n{prompt}")
+            # Choose the appropriate agent based on the task
+            agent = self.synthesis_agent if use_synthesis_model else self.batch_agent
+            model_name = self.synthesis_model if use_synthesis_model else self.batch_model
+            
+            response = agent(f"{system_message}\n\n{prompt}")
             
             # Handle AgentResult object properly
             if hasattr(response, 'content'):
@@ -313,57 +396,53 @@ Return your analysis in this JSON format:
                 return {"raw_analysis": analysis_text}
                 
         except Exception as e:
-            print(f"  ❌ Analysis error: {e}")
+            print(f"  ❌ Analysis error ({model_name}): {e}")
             return None
     
-    def aggregate_insights(self, all_analyses):
-        """Aggregate insights from all batch analyses"""
-        print("🔄 Aggregating insights from all analyses...")
+    def aggregate_structural_insights(self, structural_analyses):
+        """Aggregate structural pattern insights from all batches"""
+        print("� Aggregating structural insights...")
         
         aggregation_prompt = f"""
-Based on the following style analyses from multiple batches of LinkedIn posts, create a comprehensive summary of this writer's style characteristics.
+Analyze the following structural pattern analyses from multiple batches of LinkedIn posts. Focus on identifying the most consistent structural characteristics.
 
-ANALYSIS DATA:
-{json.dumps(all_analyses, indent=2)}
+STRUCTURAL ANALYSES:
+{json.dumps(structural_analyses, indent=2)}
 
-Please synthesize these findings into a unified style profile. Look for:
-1. Consistent patterns across batches
-2. Most frequent characteristics
-3. Distinctive style elements that make this writer unique
-4. Quantifiable metrics where possible
-
-Create a comprehensive style summary that captures the essence of how this person writes on LinkedIn.
+Synthesize these findings into a unified structural profile. Look for:
+1. Most consistent sentence and paragraph patterns
+2. Common formatting preferences  
+3. Typical opening and closing strategies
+4. Structural elements that make this writing distinctive
 
 Return your synthesis in this JSON format:
 {{
-  "style_summary": {{
-    "primary_characteristics": ["top 5 most defining characteristics"],
-    "structural_signature": "how they typically structure content",
-    "tone_profile": "their consistent voice and tone",
-    "engagement_approach": "how they connect with their audience"
+  "sentence_patterns": {{
+    "avg_length": "most common range",
+    "complexity_preference": "dominant style",
+    "distinctive_patterns": ["pattern1", "pattern2"]
   }},
-  "writing_patterns": {{
-    "sentence_style": "typical sentence patterns and length",
-    "paragraph_approach": "how they organize thoughts",
-    "formatting_preferences": "bullet points, spacing, etc.",
-    "opening_signature": "how they typically start posts",
-    "closing_signature": "how they typically end posts"
+  "paragraph_structure": {{
+    "typical_organization": "how they structure thoughts",
+    "length_preference": "typical paragraph size",
+    "flow_patterns": ["common transitions", "organization style"]
   }},
-  "linkedin_optimization": {{
-    "hashtag_strategy": "their hashtag approach",
-    "emoji_usage": "how they use emojis",
-    "engagement_tactics": "how they encourage interaction",
-    "professional_positioning": "how they present their expertise"
+  "formatting_signature": {{
+    "preferred_elements": ["bullet points", "line breaks", etc.],
+    "spacing_style": "their white space usage",
+    "visual_organization": "how they make content scannable"
   }},
-  "unique_elements": ["what makes their writing distinctive"],
-  "style_prompt_components": ["key elements for an LLM style prompt"]
+  "opening_closing_patterns": {{
+    "common_openings": ["most frequent opening styles"],
+    "common_closings": ["most frequent closing styles"]
+  }}
 }}
 """
         
         try:
-            system_message = "You are an expert at synthesizing writing style analyses into comprehensive style profiles. Focus on identifying the most consistent and distinctive patterns."
+            system_message = "You are an expert at analyzing writing structure patterns. Focus on identifying the most consistent and distinctive structural elements."
             
-            response = self.agent(f"{system_message}\n\n{aggregation_prompt}")
+            response = self.batch_agent(f"{system_message}\n\n{aggregation_prompt}")
             
             # Handle AgentResult object properly
             if hasattr(response, 'content'):
@@ -379,13 +458,244 @@ Return your synthesis in this JSON format:
                 try:
                     return json.loads(json_match.group())
                 except json.JSONDecodeError:
-                    return {"raw_synthesis": synthesis_text}
+                    return {"raw_structural_analysis": synthesis_text}
             else:
-                return {"raw_synthesis": synthesis_text}
+                return {"raw_structural_analysis": synthesis_text}
                 
         except Exception as e:
-            print(f"❌ Error aggregating insights: {e}")
+            print(f"❌ Error aggregating structural insights: {e}")
             return None
+    
+    def aggregate_tone_insights(self, tone_analyses):
+        """Aggregate tone and voice insights from all batches"""
+        print("🎭 Aggregating tone and voice insights...")
+        
+        aggregation_prompt = f"""
+Analyze the following tone and voice analyses from multiple batches of LinkedIn posts. Focus on identifying the most consistent personality and voice characteristics.
+
+TONE ANALYSES:
+{json.dumps(tone_analyses, indent=2)}
+
+Synthesize these findings into a unified voice profile. Look for:
+1. Most consistent tone and personality traits
+2. Professional positioning and authority level
+3. Personal vs professional balance
+4. Distinctive voice characteristics
+
+Return your synthesis in this JSON format:
+{{
+  "voice_profile": {{
+    "primary_tone": "dominant emotional tone",
+    "professional_level": "their typical formality level",
+    "authority_style": "how they position their expertise",
+    "personality_traits": ["top 3-5 consistent traits"]
+  }},
+  "communication_style": {{
+    "perspective_preference": "first/third person usage patterns",
+    "personal_sharing_style": "how they balance personal/professional",
+    "vulnerability_approach": "their openness level",
+    "distinctive_expressions": ["unique phrases or communication patterns"]
+  }},
+  "language_characteristics": {{
+    "vocabulary_complexity": "their typical language level",
+    "industry_language_usage": "technical vs accessible approach",
+    "energy_signature": "their typical enthusiasm/energy level",
+    "rhetorical_devices": ["sarcasm", "humor", "metaphors", etc. they commonly use]
+  }}
+}}
+"""
+        
+        try:
+            system_message = "You are an expert at analyzing voice, tone, and personality patterns in writing. Focus on identifying the most consistent and distinctive characteristics."
+            
+            response = self.batch_agent(f"{system_message}\n\n{aggregation_prompt}")
+            
+            # Handle AgentResult object properly
+            if hasattr(response, 'content'):
+                synthesis_text = response.content.strip()
+            elif hasattr(response, 'text'):
+                synthesis_text = response.text.strip()
+            else:
+                synthesis_text = str(response).strip()
+            
+            # Try to extract JSON
+            json_match = re.search(r'\{.*\}', synthesis_text, re.DOTALL)
+            if json_match:
+                try:
+                    return json.loads(json_match.group())
+                except json.JSONDecodeError:
+                    return {"raw_tone_analysis": synthesis_text}
+            else:
+                return {"raw_tone_analysis": synthesis_text}
+                
+        except Exception as e:
+            print(f"❌ Error aggregating tone insights: {e}")
+            return None
+    
+    def aggregate_engagement_insights(self, engagement_analyses):
+        """Aggregate engagement and LinkedIn optimization insights from all batches"""
+        print("🤝 Aggregating engagement insights...")
+        
+        aggregation_prompt = f"""
+Analyze the following engagement analyses from multiple batches of LinkedIn posts. Focus on identifying the most consistent audience engagement and LinkedIn optimization patterns.
+
+ENGAGEMENT ANALYSES:
+{json.dumps(engagement_analyses, indent=2)}
+
+Synthesize these findings into a unified engagement profile. Look for:
+1. Most consistent engagement strategies
+2. LinkedIn-specific optimization patterns
+3. Audience interaction preferences
+4. Value delivery methods
+
+Return your synthesis in this JSON format:
+{{
+  "engagement_strategy": {{
+    "question_usage": "how they typically use questions",
+    "cta_patterns": "their call-to-action approach",
+    "interaction_style": "how they invite responses",
+    "hook_techniques": ["their most common attention-grabbing methods"]
+  }},
+  "linkedin_optimization": {{
+    "hashtag_strategy": "their typical hashtag approach",
+    "emoji_usage": "frequency and style of emoji use",
+    "formatting_for_engagement": "how they structure for readability",
+    "professional_positioning": "how they establish credibility"
+  }},
+  "value_delivery": {{
+    "content_approach": "how they provide value to readers",
+    "storytelling_patterns": "their narrative techniques",
+    "example_usage": "how they use concrete examples",
+    "community_building": "how they foster connections"
+  }}
+}}
+"""
+        
+        try:
+            system_message = "You are an expert at analyzing audience engagement and social media optimization patterns. Focus on identifying the most consistent and effective engagement strategies."
+            
+            response = self.batch_agent(f"{system_message}\n\n{aggregation_prompt}")
+            
+            # Handle AgentResult object properly
+            if hasattr(response, 'content'):
+                synthesis_text = response.content.strip()
+            elif hasattr(response, 'text'):
+                synthesis_text = response.text.strip()
+            else:
+                synthesis_text = str(response).strip()
+            
+            # Try to extract JSON
+            json_match = re.search(r'\{.*\}', synthesis_text, re.DOTALL)
+            if json_match:
+                try:
+                    return json.loads(json_match.group())
+                except json.JSONDecodeError:
+                    return {"raw_engagement_analysis": synthesis_text}
+            else:
+                return {"raw_engagement_analysis": synthesis_text}
+                
+        except Exception as e:
+            print(f"❌ Error aggregating engagement insights: {e}")
+            return None
+    
+    def aggregate_insights(self, all_analyses):
+        """Aggregate insights from all batch analyses using staged approach"""
+        print("🔄 Starting staged aggregation of insights...")
+        
+        # Stage 1: Aggregate each analysis type separately
+        structural_insights = self.aggregate_structural_insights(all_analyses.get('structural', []))
+        tone_insights = self.aggregate_tone_insights(all_analyses.get('tone', []))
+        engagement_insights = self.aggregate_engagement_insights(all_analyses.get('engagement', []))
+        
+        # Stage 2: Combine the pre-aggregated insights
+        print("🎯 Combining staged insights into final profile...")
+        
+        combined_insights = {
+            "structural_profile": structural_insights,
+            "tone_profile": tone_insights,
+            "engagement_profile": engagement_insights
+        }
+        
+        # Stage 3: Create final synthesis from the three pre-aggregated summaries
+        final_synthesis_prompt = f"""
+Based on these three pre-aggregated style analysis summaries, create a final comprehensive writing style profile.
+
+STRUCTURAL PROFILE:
+{json.dumps(structural_insights, indent=2) if structural_insights else "No structural insights available"}
+
+TONE PROFILE:
+{json.dumps(tone_insights, indent=2) if tone_insights else "No tone insights available"}
+
+ENGAGEMENT PROFILE:
+{json.dumps(engagement_insights, indent=2) if engagement_insights else "No engagement insights available"}
+
+Create a unified style profile that combines these three dimensions. Focus on:
+1. How structure, tone, and engagement work together
+2. The most distinctive and consistent patterns across all three areas
+3. Key elements that would be essential for replicating this writing style
+
+Return your synthesis in this JSON format:
+{{
+  "style_summary": {{
+    "primary_characteristics": ["top 5 most defining characteristics across all dimensions"],
+    "structural_signature": "key structural patterns",
+    "tone_profile": "core voice and personality",
+    "engagement_approach": "how they connect with audience"
+  }},
+  "writing_patterns": {{
+    "sentence_style": "typical patterns and length",
+    "paragraph_approach": "organization style",
+    "formatting_preferences": "visual organization preferences",
+    "opening_signature": "how they start posts",
+    "closing_signature": "how they end posts"
+  }},
+  "linkedin_optimization": {{
+    "hashtag_strategy": "hashtag approach",
+    "emoji_usage": "emoji patterns",
+    "engagement_tactics": "interaction strategies",
+    "professional_positioning": "credibility building"
+  }},
+  "unique_elements": ["what makes their writing distinctive"],
+  "style_prompt_components": ["key elements for LLM replication"]
+}}
+"""
+        
+        try:
+            system_message = "You are an expert at synthesizing multi-dimensional writing style analyses into cohesive profiles. Focus on how structure, tone, and engagement work together to create a distinctive writing voice."
+            
+            response = self.synthesis_agent(f"{system_message}\n\n{final_synthesis_prompt}")
+            
+            # Handle AgentResult object properly
+            if hasattr(response, 'content'):
+                synthesis_text = response.content.strip()
+            elif hasattr(response, 'text'):
+                synthesis_text = response.text.strip()
+            else:
+                synthesis_text = str(response).strip()
+            
+            # Try to extract JSON
+            json_match = re.search(r'\{.*\}', synthesis_text, re.DOTALL)
+            if json_match:
+                try:
+                    final_profile = json.loads(json_match.group())
+                    # Add the detailed profiles for reference
+                    final_profile["detailed_profiles"] = combined_insights
+                    return final_profile
+                except json.JSONDecodeError:
+                    return {
+                        "raw_final_synthesis": synthesis_text,
+                        "detailed_profiles": combined_insights
+                    }
+            else:
+                return {
+                    "raw_final_synthesis": synthesis_text,
+                    "detailed_profiles": combined_insights
+                }
+                
+        except Exception as e:
+            print(f"❌ Error in final synthesis: {e}")
+            print("🔄 Returning pre-aggregated insights...")
+            return combined_insights
     
     def generate_style_prompt(self, aggregated_insights):
         """Generate a comprehensive style prompt for LLMs"""
@@ -399,10 +709,11 @@ STYLE ANALYSIS SUMMARY:
 {json.dumps(aggregated_insights, indent=1)[:3000]}...
 
 Create a practical style guide with these sections:
-1. TONE & VOICE: Key characteristics for replicating their voice
+1. TONE & VOICE: Key characteristics for replicating their voice including tone, lenght of sentences, common expressions and usage of storytelling devices such as humour, sarcasm and cynicism
 2. STRUCTURE: How they organize posts (openings, body, closings)  
 3. ENGAGEMENT: How they connect with audiences
 4. LINKEDIN OPTIMIZATION: Hashtags, emojis, formatting patterns
+5. OTHER: any other remarks, observations or unique elements that define their style not mentioned above
 
 Format as a clear, actionable prompt that starts with "LINKEDIN WRITING STYLE GUIDE:" and provides specific instructions for an LLM to follow when generating content in this person's voice.
 
@@ -411,7 +722,7 @@ Keep it concise but comprehensive - focus on the most distinctive and important 
         try:
             system_message = "You are an expert at creating concise, actionable LLM prompts. Generate a comprehensive style guide that captures the essential elements of this person's writing voice."
             
-            response = self.agent(f"{system_message}\n\n{prompt_generation_request}")
+            response = self.synthesis_agent(f"{system_message}\n\n{prompt_generation_request}")
             
             # Handle AgentResult object properly
             if hasattr(response, 'content'):

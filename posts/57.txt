@@ -1,0 +1,1 @@
+Really good article summarizing a paper formalizing the types of metrics (SLI, SLA and SLO) and how should they be defined, that anyone providing a service should understand.

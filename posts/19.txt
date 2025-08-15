@@ -1,0 +1,5 @@
+This is why browser diversity is a good thing: https://lnkd.in/diuhYjtb
+
+Google, the company that develops the most popular browser in the world, also generates most of its revenue through its ads business and is planning to implement changes that will significantly limit the ability of Chrome extensions to work as effective ad blockers.
+
+Good thing there's still Firefox, Safari (for now -- let's see what Apple does), and hopefully all these "improvements" can be removed from the Chromium source code for other open source browsers. hashtag#privacy
