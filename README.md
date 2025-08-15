@@ -149,6 +149,39 @@ linkedin-post-generator/
 ├── .env                             # Environment variables
 └── README.md                        # This file
 ```
+
+## ⚙️ Model Configuration
+
+The system supports different AI models for different tasks to optimize cost and performance:
+
+### **Multi-Agent System Models**
+Configure in your `.env` file:
+
+```bash
+# Link Analysis (web content processing, URL analysis)
+LINK_ANALYSIS_MODEL=gpt-4o-mini
+
+# Research Tasks (topic research, trend analysis, statistics gathering)  
+RESEARCH_MODEL=gpt-4o-mini
+
+# Post Composition (final content generation with style matching)
+COMPOSITION_MODEL=gpt-4o
+```
+
+### **Style Analyzer Models**
+```bash
+# Batch Processing (structural, tone, engagement analysis)
+ANALYZER_BATCH_MODEL=gpt-4o-mini
+
+# Final Synthesis (style prompt generation)
+ANALYZER_SYNTHESIS_MODEL=gpt-4o
+```
+
+### **Model Selection Guidelines**
+- **GPT-4o-mini**: Faster, cheaper, higher rate limits - ideal for bulk processing
+- **GPT-4o**: Higher quality, better reasoning - use for final synthesis and style-critical tasks
+- **Custom Models**: Any OpenAI-compatible model can be specified
+
 ## 📝 Tips for Better Posts
 
 1. **Quality Reference Posts**: Ensure your existing posts in `posts/` are high-quality examples of your writing

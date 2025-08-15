@@ -200,3 +200,4 @@ tmp/
 *.bak
 *.backup
 *~
+input/linkedin_style_analysis_results.json

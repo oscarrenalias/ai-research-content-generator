@@ -34,6 +34,24 @@ def main():
         print("🚀 Starting multi-agent workflow...")
         final_post = generator.generate_post(use_strands_workflow=False)  # Use sequential by default
         
+        # Save the generated post to output file
+        import os
+        output_dir = "output"
+        output_file = os.path.join(output_dir, "result.txt")
+        
+        try:
+            # Ensure output directory exists
+            os.makedirs(output_dir, exist_ok=True)
+            
+            # Write the final post to file
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(final_post)
+            
+            print(f"💾 Generated post saved to: {output_file}")
+            
+        except Exception as e:
+            print(f"⚠️ Warning: Could not save post to file: {e}")
+        
         # Display final results
         print("\n" + "="*80)
         print("🎯 FINAL LINKEDIN POST:")

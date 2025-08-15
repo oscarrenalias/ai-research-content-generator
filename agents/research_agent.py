@@ -14,7 +14,7 @@ from tavily import TavilyClient
 
 
 class ResearchAgent:
-    def __init__(self, openai_api_key: str = None, model: str = "gpt-4o"):
+    def __init__(self, openai_api_key: str = None, model: str = None):
         """Initialize the Research Agent with topic analysis capabilities"""
         
         # Use provided API key or get from environment
@@ -25,6 +25,15 @@ class ResearchAgent:
             from dotenv import load_dotenv
             load_dotenv()
             self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        
+        # Use provided model or get from environment
+        if model:
+            self.model = model
+        else:
+            import os
+            from dotenv import load_dotenv
+            load_dotenv()
+            self.model = os.getenv("RESEARCH_MODEL", "gpt-4o-mini")
         
         if not self.openai_api_key:
             raise Exception("OPENAI_API_KEY not found. Please set it in .env file or pass it directly.")
@@ -50,7 +59,7 @@ class ResearchAgent:
             
             openai_model = OpenAIModel(
                 client_args={"api_key": self.openai_api_key},
-                model_id=model,
+                model_id=self.model,
                 params={"temperature": 0.3, "max_tokens": 2000}
             )
             
@@ -85,6 +94,7 @@ Use your extensive knowledge to provide comprehensive insights. Always structure
             )
             
             print("✅ Research Agent initialized with OpenAI API")
+            print(f"🔍 Using model: {self.model}")
             
         except Exception as e:
             raise Exception(f"Failed to initialize Research Agent: {e}")
