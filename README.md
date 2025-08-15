@@ -109,6 +109,11 @@ TAVILY_API_KEY=tvly-dev-xxx
 python linkedin_multi_agent_generator.py
 ```
 
+**Post Feedback & Critique**
+```bash
+python linkedin_feedback_critique.py
+```
+
 **Style Analysis**
 
 This is required to instruct the model how to write:
@@ -123,6 +128,13 @@ The **Multi-Agent Generator** will:
 3. 📝 Generate posts using specialized agents for link analysis, research, and composition
 4. 🎯 Combine current web data with your personal writing style
 
+The **Feedback & Critique Agent** will:
+1. 🎯 Analyze instruction alignment and topic coverage
+2. 📝 Evaluate style guide compliance and voice consistency
+3. 🔍 Assess readability and accessibility for diverse audiences  
+4. 📋 Review structure, length, and formatting
+5. 💡 Provide specific, actionable recommendations
+
 The **Style Analyzer** will:
 1. 🔍 Perform deep analysis of all your posts
 2. 📊 Extract detailed writing patterns and characteristics  
@@ -135,6 +147,10 @@ linkedin-post-generator/
 ├── input/                         # Input files
 │   ├── instructions.txt           # Your post instructions  
 │   └── [data_export.zip]          # LinkedIn export (optional)
+├── output/                        # Generated content and analysis
+│   ├── result.txt                 # Generated LinkedIn post
+│   ├── result-feedback.txt        # Feedback and critique analysis
+│   └── result-feedback.json       # Raw feedback data (JSON)
 ├── posts/                         # Your existing posts (one file per post)
 │   ├── post_1.txt
 │   └── ...
@@ -142,8 +158,10 @@ linkedin-post-generator/
 │   ├── __init__.py
 │   ├── link_analysis_agent.py     # URL analysis and content extraction
 │   ├── research_agent.py          # Real-time web research with Tavily
-│   └── post_composition_agent.py  # Final post generation
+│   ├── post_composition_agent.py  # Final post generation
+│   └── feedback_agent.py          # Post analysis and critique
 ├── linkedin_multi_agent_generator.py  # Multi-agent post generator (recommended)
+├── linkedin_feedback_critique.py      # Independent feedback analysis tool
 ├── linkedin_style_analyzer.py        # Advanced style analysis tool
 ├── linkedin_export_processor.py      # Process LinkedIn exportss
 ├── .env                             # Environment variables
@@ -175,6 +193,12 @@ ANALYZER_BATCH_MODEL=gpt-4o-mini
 
 # Final Synthesis (style prompt generation)
 ANALYZER_SYNTHESIS_MODEL=gpt-4o
+```
+
+### **Feedback & Critique Agent**
+```bash
+# Feedback Analysis (post critique, quality assessment)
+FEEDBACK_MODEL=gpt-4o-mini
 ```
 
 ### **Model Selection Guidelines**
