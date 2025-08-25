@@ -35,7 +35,7 @@ Yes, this was vibe coded.
 
 2. **Configure environment**:
 
-Copy ```.env.sample``` to ```.env``` and update as needed:
+Copy ```.env.example``` to ```.env``` and update as needed:
 
 These are used for post generation (writing). Use a different model or temperature if you'd like the model to get
 more creative:
