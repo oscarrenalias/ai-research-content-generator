@@ -106,12 +106,12 @@ TAVILY_API_KEY=tvly-dev-xxx
 
 **Multi-Agent Content Generation**
 ```bash
-python linkedin_multi_agent_generator.py
+uv run python linkedin_multi_agent_generator.py
 ```
 
 **Post Feedback & Critique**
 ```bash
-python linkedin_feedback_critique.py
+uv run python linkedin_feedback_critique.py
 ```
 
 **Style Analysis**

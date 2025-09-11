@@ -1,0 +1,3 @@
+This is not a bug, it’s a feature. There will always be successful pilots and valuable use cases, like the ones shared below, but Europe’s cautious approach emphasizes responsible AI, balancing rapid scaling with sustainability, and leveraging regulatory maturity to prevent social backlash and build trust. There’s even data stating that 75-80% of rushed AI deployments fail to deliver meaningful value, so why the risk at a time when IT budgets are smaller than ever?
+
+In my opinion, true competitiveness lies not in rushing, but in deploying AI that is safe, durable, and aligned with the long-term societal concerns and values that AI is threatening.

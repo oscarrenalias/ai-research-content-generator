@@ -110,8 +110,15 @@ Use your extensive knowledge to provide comprehensive insights. Always structure
         Returns:
             List of key topics to research
         """
-        # Extract topics from instructions using AI
-        topic_extraction_prompt = f"""Analyze the following content and extract the key topics and themes that should be researched for a LinkedIn post:
+        # Extract topics from instructions using AI, but always include any topics explicitly listed under a heading like
+        # 'additional topics for research' or similar in the instructions file. These should be weighted and prioritized in the output.
+        topic_extraction_prompt = f"""
+Analyze the following content and extract the key topics and themes that should be researched for a LinkedIn post.
+
+IMPORTANT:
+- If the instructions contain a section or heading such as 'additional topics for research', 'topics for consideration', or similar, ALWAYS include all topics explicitly listed under that heading in the final output, regardless of what you infer elsewhere.
+- These user-specified topics should be prioritized and appear first in the output list.
+- After including all explicit user-specified topics, supplement with any additional key topics you discern from the rest of the instructions and link analysis, up to a total of 3-5 topics.
 
 ORIGINAL INSTRUCTIONS:
 {instructions}
@@ -119,17 +126,11 @@ ORIGINAL INSTRUCTIONS:
 LINK ANALYSIS THEMES:
 {link_analysis.get('aggregated_themes', [])}
 
-LINK ANALYSIS KEY POINTS:  
-{link_analysis.get('all_key_points', [])[:10]}  # Limit to avoid token overflow
+LINK ANALYSIS KEY POINTS:
+{link_analysis.get('all_key_points', [])[:10]}
 
-Please identify 3-5 key topics that would benefit from additional research and context. Focus on:
-- Main subject areas
-- Industry trends mentioned
-- Technical concepts that need explanation
-- Business implications
-- Professional development angles
-
-Return the topics as a simple JSON list: ["topic1", "topic2", "topic3"]"""
+Return the topics as a simple JSON list: ["topic1", "topic2", "topic3"]
+"""
 
         try:
             response = self.agent(topic_extraction_prompt)

@@ -1,26 +1,29 @@
 # Overview 
 
-- I've been experimenting with coding assistants for quite some now, mostly GitHub Copilot with GPT-4 and Claude. 
-- There's a push in the industry to go towards autonomous coding assistants; pick up a pull request, generate the code, have another agent review the PR and merge automatically
-- this will be used to reduce the size of engineering teams, but that will be a costly mistake in the long run if there's no one accountable for the quality of the code
-- what should happen is that Software Engineers should become less focused on Software, and more focused on Engineering
-- software engineers should not need to worry about learning the ins and outs of a language, but can focus on the 
-engineering aspects of software engineerig; that is, creating modular, maintainable, well-structured and performant code
+- Industry-push to leverage AI coding assistantsa and agents. Companies like Coinbase are already producing 40% of their code with AI
+- the underlying assumption is that IT leaders will use to reduce the size of engineering teams -- in my opinion, this is the wrong approach
+- my view is that the role of a software engineer will shift; it will be less about software (knowing all the ins and outs of a language and
+a framework) and more about *engineering*: does this code do what it's supposed to do? should it be refactored? is it performant? is it secure? it will
+allow engineers to spend time to ensure that code is good and high-quality as opposed to fiddling with a language, platform or framework
 
-In my opinion, coding assistants still:
-- require significant guidance, e.g., they can't typically figure out that there's an existing library for what they're trying to achieve and will instead code from scratch
-- they're not very good at refactoring; they tend to write the same code multiple times -- I've had to guide them to reuse existing code/libraries/functions 
-- they can be a little too eager to write code; I always have to reign in Claude 4 and ask it to produce a design and implementation plan, otherwise it will happily create hundreds of lines of code with a one-line prompt
+In my experience:
+- coding assistants work well for commoditized code
+- need to be guided to the right design; they're usually very eager to write code. Claude Code has a planning mode, which is great, but
+Copilot Agent needs to be reigned in and must be forced to design before generating code
+- still require significant guidance, e.g., can't typically figure out that there's an existing library for what they're trying to achieve and will instead code from scratch
+- they're not very good at refactoring; they tend to write similar code multiple times -- I've had to guide them to reuse existing code/libraries/functions 
 
 Conclusion:
-- Coding assistants should be used to make developers more efficient and to write better commoditized code
+- Coding assistants should be used to make developers more efficient and to write commoditized code
 - Should not be used as an excuse to replace software engineers
 - there is a major risk that codebases will become unmaintainable otherwise, leading to poor performance and security risks
 
 # Topics for consideration and additional research
 
 - GitHub Copilot autonomous agent: https://github.blog/ai-and-ml/github-copilot/assigning-and-completing-issues-with-coding-agent-in-github-copilot/
-- Please do some research about constraints in current coding assistants
+- Constraints in current coding assistants
+- The risks of replacing software engineering skills with coding assistants
+- Security issues with coding assistants: https://siliconangle.com/2025/09/04/apiiro-report-finds-ai-code-assistants-increase-developer-speed-heighten-security-risk/ 
 
 # key topics/hashtags
 
