@@ -1,0 +1,29 @@
+I found this article very enlightening, it validates and articulates so many concerns about OpenAI that I’ve observed and shared for some time: https://techcrunch.com/2025/10/10/the-fixers-dilemma-chris-lehane-and-openais-impossible-mission/. 
+
+I find it interesting that OpenAI, instead of trying to provide clear answers to key issues, hired someone who is focused on narrative management instead of directly addressing accountability. I’d rather OpenAI admit that they don’t have all answers (which they don’t) so that we collectively work on the issues together. There's a lot more at stake here than just OpenAI's growth plan.
+
+For starters, intellectual property rights continue to be consistently ignored. OpenAI reportedly trained on thousands of books without compensating creators, and Sora 2 was released with copyrighted materials included. This further complicated matters by offering rights holders only an opt-out process, allowing Sora to generate videos featuring copyrighted characters, or worse, enabling the distribution of AI-generated media to families of deceased public figures.
+
+This is indefensible in my opinion. OpenAI was aware of these risks, but proceeded anyway. As the article says, “That’s not iterating. That’s testing how much you can get away with”.
+
+What’s perhaps even more alarming is that the calls are now coming from inside OpenAI itself. Josh Achiam, OpenAI’s head of mission alignment, recently tweeted “We can’t be doing things that make us into a frightening power instead of a virtuous one. We have a duty to and a mission for all of humanity. The bar to pursue that duty is remarkably high.” 
+
+We can’t pretend that “ship now, explain later” is harmless when the cost and burden fall on creators, rights holders, and everyday people. When a business consistently tests boundaries instead of seeking consent and accountability, these problems aren’t just accidents but they're the operating model.
+
+It's a difficult issue to address, but this is what not just OpenAI but the whole the AI industry could start with:
+
+🔍 Real transparency on training data, backed by independent auditability
+
+📝 Opt-in licensing and compensation for creators and rights holders by default. Contracts, not vibes and opt‑outs
+
+🛠️ Robust provenance/watermarking plus rapid takedown and appeals channels
+
+👥 Independent oversight with published red-team results and clear timelines
+
+🛡️ Comprehensive guardrails to shield young minds and vulnerable users—proactively prevent exposure to harmful AI content, support mental health, and address recent safety controversies
+
+🌐 Transparent governance of foundation models governed by a global entity, such as the UN or a newly created authority, to ensure AI serves the interest of all humanity 
+
+OpenAI—and the industry at large should meet creators, researchers, broader society and work together to create the guardrails and societal frameworks to succeed. AI is a transformative technology but we can't spin trust, it needs to be earned through the choices we make together.
+
+#AI #AIGovernance #ResponsibleAI
